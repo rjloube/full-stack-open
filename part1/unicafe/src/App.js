@@ -17,9 +17,7 @@ const Counter = ({ text1, count, text2 }) => {
 };
 
 const Statistics = (props) => {
-  console.log(props);
-  console.log(`all: ${props.categories[4].count}`);
-  if (props.categories[4].count === 0) {
+  if (props.categories[3].count === 0) {
     return <div>No feedback given</div>;
   }
 
@@ -68,13 +66,10 @@ const App = () => {
   const handleGlobalClick = (buttonValue, totalGood) => {
     const updatedAll = all + 1;
     setAll(updatedAll);
-    console.log(`updatedAll: ${updatedAll}`);
     const updatedSum = sum + buttonValue;
     setSum(updatedSum);
-    console.log(`updatedSum: ${updatedSum}`);
     const updatedAverage = updatedSum / updatedAll;
     setAverage(updatedAverage);
-    console.log(`updatedAverage: ${updatedAverage}`);
     const updatedPositive = (totalGood * 100) / updatedAll;
     setPositive(updatedPositive);
   };
@@ -82,21 +77,18 @@ const App = () => {
   const handleGoodClick = () => {
     const updatedGood = good + 1;
     setGood(updatedGood);
-    console.log(`updatedGood: ${updatedGood}`);
     handleGlobalClick(1, updatedGood);
   };
 
   const handleNeutralClick = () => {
     const updatedNeutral = neutral + 1;
     setNeutral(updatedNeutral);
-    console.log(`updatedNeutral: ${updatedNeutral}`);
     handleGlobalClick(0, good);
   };
 
   const handleBadClick = () => {
     const updatedBad = bad + 1;
     setBad(updatedBad);
-    console.log(`updatedBad: ${updatedBad}`);
     handleGlobalClick(-1, good);
   };
 

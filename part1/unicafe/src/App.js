@@ -8,11 +8,13 @@ const Header = ({ text1 }) => {
   return <h1>{text1}</h1>;
 };
 
-const Counter = ({ text1, count, text2 }) => {
+const StatisticLine = ({ text1, count, text2 }) => {
   return (
-    <div>
-      {text1} {count} {text2}
-    </div>
+    <tr>
+      <td>{text1}</td>
+      <td>{count}</td>
+      <td>{text2}</td>
+    </tr>
   );
 };
 
@@ -24,31 +26,35 @@ const Statistics = (props) => {
   return (
     <>
       <Header text1={props.header} />
-      <Counter
-        text1={props.categories[0].name}
-        count={props.categories[0].count}
-      />
-      <Counter
-        text1={props.categories[1].name}
-        count={props.categories[1].count}
-      />
-      <Counter
-        text1={props.categories[2].name}
-        count={props.categories[2].count}
-      />
-      <Counter
-        text1={props.categories[3].name}
-        count={props.categories[3].count}
-      />
-      <Counter
-        text1={props.categories[4].name}
-        count={props.categories[4].count}
-      />
-      <Counter
-        text1={props.categories[5].name}
-        count={props.categories[5].count}
-        text2="%"
-      />
+      <table>
+        <tbody>
+          <StatisticLine
+            text1={props.categories[0].name}
+            count={props.categories[0].count}
+          />
+          <StatisticLine
+            text1={props.categories[1].name}
+            count={props.categories[1].count}
+          />
+          <StatisticLine
+            text1={props.categories[2].name}
+            count={props.categories[2].count}
+          />
+          <StatisticLine
+            text1={props.categories[3].name}
+            count={props.categories[3].count}
+          />
+          <StatisticLine
+            text1={props.categories[4].name}
+            count={props.categories[4].count}
+          />
+          <StatisticLine
+            text1={props.categories[5].name}
+            count={props.categories[5].count}
+            text2="%"
+          />
+        </tbody>
+      </table>
     </>
   );
 };

@@ -37,9 +37,7 @@ const App = () => {
   const [persons, setPersons] = useState([]);
 
   useEffect(() => {
-    console.log('effect');
     axios.get("http://localhost:3001/persons").then((response) => {
-      console.log('promise fulfilled');
       setPersons(response.data);
     });
   }, []);
@@ -63,22 +61,24 @@ const App = () => {
     if (alreadyExists) {
       alert(`${contactObject.newName} is already added to phonebook`);
     } else {
-      setPersons(persons.concat(contactObject));
+      axios
+        .post("http://localhost:3001/persons", contactObject)
+        .then((response) => {
+          setPersons(persons.concat(contactObject));
+          console.log(response);
+        });
     }
   };
 
   const handleNameChange = (event) => {
-    console.log(event.target.value);
     setNewName(event.target.value);
   };
 
   const handleNumberChange = (event) => {
-    console.log(event.target.value);
     setNewNumber(event.target.value);
   };
 
   const handleFilterChange = (event) => {
-    console.log(event.target.value);
     setNewFilter(event.target.value);
   };
 

@@ -26,10 +26,28 @@ const PersonForm = ({ addContact, handleNameChange, handleNumberChange }) => {
   );
 };
 
-const Persons = ({ personsToShow }) => {
+const Button = ({ text, handleClick }) => {
+  <button onClick={handleClick}>{text}</button>;
+};
+
+// TODO: Define handleClick here so we can access the right person to delete as function parameter
+// Create function in App for modifying persons state, pass in within handleClick function
+const Persons = ({ personsToShow, onDelete }) => {
   return personsToShow.map((person) => (
     <div key={person.name}>
       {person.name} {person.number}
+      &nbsp;
+      <button
+        // DO NOT pass in param to OnClick
+        onClick={() => {
+          if (window.confirm(`Delete ${person.name}?`)) {
+            personService.deletePerson(person.id);
+            onDelete(person);
+          }
+        }}
+      >
+        {person.name}
+      </button>
     </div>
   ));
 };
@@ -84,6 +102,10 @@ const App = () => {
     setNewFilter(event.target.value);
   };
 
+  const onDelete = (personToDelete) => {
+    setPersons(persons.filter((person) => person.id !== personToDelete.id));
+  };
+
   const personsToShow =
     newFilter === ""
       ? persons
@@ -102,7 +124,7 @@ const App = () => {
         handleNumberChange={handleNumberChange}
       />
       <h3>Numbers</h3>
-      <Persons personsToShow={personsToShow} />
+      <Persons personsToShow={personsToShow} onDelete={onDelete} />
     </div>
   );
 };

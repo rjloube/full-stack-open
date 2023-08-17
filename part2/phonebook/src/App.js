@@ -30,8 +30,6 @@ const Button = ({ text, handleClick }) => {
   <button onClick={handleClick}>{text}</button>;
 };
 
-// TODO: Define handleClick here so we can access the right person to delete as function parameter
-// Create function in App for modifying persons state, pass in within handleClick function
 const Persons = ({ personsToShow, onDelete }) => {
   return personsToShow.map((person) => (
     <div key={person.name}>
@@ -46,7 +44,7 @@ const Persons = ({ personsToShow, onDelete }) => {
           }
         }}
       >
-        {person.name}
+        delete
       </button>
     </div>
   ));
@@ -76,13 +74,34 @@ const App = () => {
 
     const alreadyExists = persons.find((person) => {
       return (
-        person.name === contactObject.name &&
+        person.name.toLowerCase() === contactObject.name.toLowerCase() &&
         person.number === contactObject.number
       );
     });
 
+    const modifiedPerson = persons.find((person) => {
+      if (
+        person.name == contactObject.name &&
+        person.number !== contactObject.number
+      ) {
+        return person;
+      }
+    });
+
     if (alreadyExists) {
       alert(`${contactObject.name} is already added to phonebook`);
+    } else if (modifiedPerson) {
+      if (
+        window.confirm(
+          `${contactObject.name} is already added to phonebook, replace the old number with a new one?`
+        )
+      ) {
+        personService
+          .updateNumber(modifiedPerson, contactObject.number)
+          .then(() => {
+            personService.getAll().then((newPersons) => setPersons(newPersons));
+          });
+      }
     } else {
       personService
         .create(contactObject)

@@ -39,7 +39,8 @@ const Persons = ({ personsToShow, onDelete }) => {
         // DO NOT pass in param to OnClick
         onClick={() => {
           if (window.confirm(`Delete ${person.name}?`)) {
-            personService.deletePerson(person.id);
+            console.log('About to delete:', personsToShow.length);
+            personService.deletePerson(personsToShow.length);
             onDelete(person);
           }
         }}
@@ -134,6 +135,7 @@ const App = () => {
 
   return (
     <div>
+      <p>{persons.map(person => <li key={person.id}>{person.id} {person.name}</li>)}</p>
       <h2>Phonebook</h2>
       <Filter handleFilterChange={handleFilterChange} />
       <h3>Add a new</h3>

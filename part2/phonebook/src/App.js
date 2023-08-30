@@ -1,6 +1,7 @@
 import axios from "axios";
 import { useState, useEffect } from "react";
 import personService from "./services/persons";
+import "./index.css";
 
 const Filter = ({ handleFilterChange }) => {
   return (
@@ -39,8 +40,8 @@ const Persons = ({ personsToShow, onDelete }) => {
         // DO NOT pass in param to OnClick
         onClick={() => {
           if (window.confirm(`Delete ${person.name}?`)) {
-            console.log('About to delete:', personsToShow.length);
-            personService.deletePerson(personsToShow.length);
+            console.log("About to delete:", person.id);
+            personService.deletePerson(person.id);
             onDelete(person);
           }
         }}
@@ -51,8 +52,16 @@ const Persons = ({ personsToShow, onDelete }) => {
   ));
 };
 
+const Notification = ({ message }) => {
+  if (message === null) {
+    return null;
+  }
+  return <div className="notification">{message}</div>;
+};
+
 const App = () => {
   const [persons, setPersons] = useState([]);
+  const [notification, setNotification] = useState();
 
   useEffect(() => {
     personService.getAll().then((initialPersons) => {
@@ -82,7 +91,7 @@ const App = () => {
 
     const modifiedPerson = persons.find((person) => {
       if (
-        person.name == contactObject.name &&
+        person.name === contactObject.name &&
         person.number !== contactObject.number
       ) {
         return person;
@@ -100,13 +109,23 @@ const App = () => {
         personService
           .updateNumber(modifiedPerson, contactObject.number)
           .then(() => {
-            personService.getAll().then((newPersons) => setPersons(newPersons));
+            personService.getAll().then((newPersons) => {
+              setPersons(newPersons);
+              setNotification(`Modified ${modifiedPerson.name}`);
+              setTimeout(() => {
+                setNotification(null);
+              }, 5000);
+            });
           });
       }
     } else {
-      personService
-        .create(contactObject)
-        .then(setPersons(persons.concat(contactObject)));
+      personService.create(contactObject).then((newPerson) => {
+        setPersons(persons.concat(newPerson));
+        setNotification(`Added ${newPerson.name}`);
+        setTimeout(() => {
+          setNotification(null);
+        }, 5000);
+      });
     }
   };
 
@@ -135,7 +154,7 @@ const App = () => {
 
   return (
     <div>
-      <p>{persons.map(person => <li key={person.id}>{person.id} {person.name}</li>)}</p>
+      <Notification message={notification} />
       <h2>Phonebook</h2>
       <Filter handleFilterChange={handleFilterChange} />
       <h3>Add a new</h3>

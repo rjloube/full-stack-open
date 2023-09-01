@@ -12,8 +12,19 @@ code {
     monospace;
 }
 
-.notification {
+.info-message {
   color: green;
+  background: lightgrey;
+  font-size: 20px;
+  font-style: italic;
+  border-style: solid;
+  border-radius: 5px;
+  padding: 10px;
+  margin-bottom: 10px;
+}
+
+.error-message {
+  color: red;
   background: lightgrey;
   font-size: 20px;
   font-style: italic;

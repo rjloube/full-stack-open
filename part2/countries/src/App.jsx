@@ -1,35 +1,38 @@
 import { useState, useEffect } from "react";
 import axios from "axios";
 
-const SingleCountry = (props) => {
-  if (props.displayedCountries.length !== 1) {
-    return
-  } else {
+const SingleCountry = ({ countryData }) => {
+  console.log("countryData:", countryData);
+  console.log("countryData boolean:", Boolean(countryData));
+  if (countryData) {
+    const languagesArray = Object.entries(countryData.languages);
+    const flagImage = countryData.flags.png;
+    console.log("flagImage:", flagImage);
     return (
-      <p>single country here</p>
-    )
+      <>
+        <h1>{countryData.name.common}</h1>
+        <p>capital {countryData.capital}</p>
+        <p>area {countryData.area}</p>
+        <h2>languages:</h2>
+        <ul>
+          {languagesArray.map((language) => {
+            return <li key={language[1]}>{language[1]}</li>;
+          })}
+        </ul>
+        <p>
+          <img src={flagImage} width="200" height="200"></img>
+        </p>
+      </>
+    );
   }
-  // <>
-  //   <h1>{props.commonName}</h1>
-  //   <p>
-  //     capital {props.capital}
-  //     area {props.area}
-  //   </p>
-  //   <h2>languages:</h2>
-  //   <ul>
-  //     {props.languages.map((language) => (
-  //       <li>language</li>
-  //     ))}
-  //   </ul>
-  //   <img>{props.flagImage}</img>
-  // </>;
 };
 
 const App = () => {
   const [value, setValue] = useState("");
   const [country, setCountry] = useState(null);
   const [commonNames, setCommonNames] = useState([]);
-  const [displayedCountries, setDisplayedCountries] = useState();
+  const [displayedCountries, setDisplayedCountries] = useState(null);
+  const [countryData, setCountryData] = useState(null);
 
   useEffect(() => {
     axios
@@ -52,18 +55,17 @@ const App = () => {
         .includes(event.target.value.toLowerCase());
     });
     console.log("newDisplayedCountries:", newDisplayedCountries);
-    if (newDisplayedCountries.length === commonNames.length) {
-      setDisplayedCountries();
-    } else if (newDisplayedCountries.length > 10) {
+    if (newDisplayedCountries.length > 10) {
+      setCountryData(null);
       setDisplayedCountries("Too many matches, specify another filter");
     } else if (newDisplayedCountries.length === 1) {
-      setDisplayedCountries(newDisplayedCountries);
       axios
         .get(
           `https://studies.cs.helsinki.fi/restcountries/api/name/${newDisplayedCountries[0]}`
         )
         .then((response) => {
-          console.log("Single country data:", response.data);
+          setDisplayedCountries(null);
+          setCountryData(response.data);
         });
     } else {
       const formattedDisplayedCountries = newDisplayedCountries.map(
@@ -71,6 +73,7 @@ const App = () => {
       );
       console.log("formattedDisplayedCountries:", formattedDisplayedCountries);
       setDisplayedCountries(formattedDisplayedCountries);
+      setCountryData(null);
     }
   };
 
@@ -81,7 +84,7 @@ const App = () => {
         <input onChange={handleCountryChange} />
       </form>
       <p>{displayedCountries}</p>
-      {/* <SingleCountry displayedCountries={displayedCountries} /> */}
+      <SingleCountry countryData={countryData} />
     </div>
   );
 };

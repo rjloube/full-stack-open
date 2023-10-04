@@ -27,12 +27,21 @@ const SingleCountry = ({ countryData }) => {
   }
 };
 
+const ListCountry = (listCountry) => {
+  return (
+    <p>
+      {listCountry} <button>show</button>
+    </p>
+  );
+};
+
 const App = () => {
   const [value, setValue] = useState("");
   const [country, setCountry] = useState(null);
   const [commonNames, setCommonNames] = useState([]);
-  const [displayedCountries, setDisplayedCountries] = useState(null);
+  const [displayedCountries, setDisplayedCountries] = useState([]);
   const [countryData, setCountryData] = useState(null);
+  const [errorMessage, setErrorMessage] = useState("");
 
   useEffect(() => {
     axios
@@ -57,17 +66,22 @@ const App = () => {
     console.log("newDisplayedCountries:", newDisplayedCountries);
     if (newDisplayedCountries.length > 10) {
       setCountryData(null);
-      setDisplayedCountries("Too many matches, specify another filter");
+      setErrorMessage("Too many matches, specify another filter");
+      setDisplayedCountries([]);
     } else if (newDisplayedCountries.length === 1) {
+      setErrorMessage("");
       axios
         .get(
           `https://studies.cs.helsinki.fi/restcountries/api/name/${newDisplayedCountries[0]}`
         )
         .then((response) => {
-          setDisplayedCountries(null);
+          setDisplayedCountries([]);
           setCountryData(response.data);
         });
+    } else if (newDisplayedCountries.length === 0) {
+      setErrorMessage("");
     } else {
+      setErrorMessage("");
       const formattedDisplayedCountries = newDisplayedCountries.map(
         (newDisplayedCountry) => newDisplayedCountry + "\n"
       );
@@ -77,13 +91,46 @@ const App = () => {
     }
   };
 
+  const handleButtonClick = (displayedCountry) => {
+    setDisplayedCountries([]);
+    console.log("displayedCountry from handleButtonClick:", displayedCountry);
+    axios
+      .get(
+        `https://studies.cs.helsinki.fi/restcountries/api/name/${displayedCountry}`
+      )
+      .then((response) => {
+        setCountryData(response.data);
+      });
+  };
+
   return (
-    <div style={{ whiteSpace: "pre-line" }}>
+    <div>
+      {console.log("displayedCountries type:", typeof displayedCountries)}
       <form>
         find countries
         <input onChange={handleCountryChange} />
       </form>
-      <p>{displayedCountries}</p>
+      <p>{errorMessage}</p>
+      {displayedCountries.map((displayedCountry) => {
+        return (
+          <p>
+            {displayedCountry}
+            <button
+              onClick={() => {
+                console.log("displayedCountry from button:", displayedCountry);
+                setDisplayedCountries([]);
+                axios
+                  .get(
+                    `https://studies.cs.helsinki.fi/restcountries/api/name/${displayedCountry}`
+                  )
+                  .then((response) => setCountryData(response.data));
+              }}
+            >
+              show
+            </button>
+          </p>
+        );
+      })}
       <SingleCountry countryData={countryData} />
     </div>
   );

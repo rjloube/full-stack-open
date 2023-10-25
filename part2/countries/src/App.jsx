@@ -1,10 +1,12 @@
 import { useState, useEffect } from "react";
 import axios from "axios";
 
-const SingleCountry = ({ countryData }) => {
+const SingleCountry = ({ countryData, weatherData }) => {
   console.log("countryData:", countryData);
+  console.log("weatherData:", weatherData);
   console.log("countryData boolean:", Boolean(countryData));
-  if (countryData) {
+  console.log("weatherData boolean:", Boolean(weatherData));
+  if (countryData && weatherData) {
     const languagesArray = Object.entries(countryData.languages);
     const flagImage = countryData.flags.png;
     console.log("flagImage:", flagImage);
@@ -22,6 +24,10 @@ const SingleCountry = ({ countryData }) => {
         <p>
           <img src={flagImage} width="200" height="200"></img>
         </p>
+        <h2>Weather in {countryData.capital}</h2>
+        <p>temperature {Math.round((weatherData.main.temp - 273.15) * 100) / 100}</p>
+        <img src={`https://openweathermap.org/img/wn/${weatherData.weather[0].icon}@2x.png`}></img>
+        <p>wind {weatherData.wind.speed} m/s</p>
       </>
     );
   }
@@ -41,7 +47,14 @@ const App = () => {
   const [commonNames, setCommonNames] = useState([]);
   const [displayedCountries, setDisplayedCountries] = useState([]);
   const [countryData, setCountryData] = useState(null);
+  const [latitude, setLatitude] = useState("null");
+  const [longitude, setlongitude] = useState(null);
+  const [weatherData, setWeatherData] = useState(null); // temperature, wind speed, wind direction, weather icon
   const [errorMessage, setErrorMessage] = useState("");
+
+  // app start cmd: export VITE_SOME_KEY={{your_api_key}}} && npm run dev
+  const api_key = import.meta.env.VITE_SOME_KEY;
+  console.log("api_key:", api_key);
 
   useEffect(() => {
     axios
@@ -77,6 +90,16 @@ const App = () => {
         .then((response) => {
           setDisplayedCountries([]);
           setCountryData(response.data);
+          console.log("countryData capital:", response.data.capital[0]);
+          const capital = response.data.capital[0];
+          axios
+            .get(
+              `https://api.openweathermap.org/data/2.5/weather?q=${capital}&appid=${api_key}`
+            )
+            .then((response) => {
+              console.log("Open Weather API response:", response);
+              setWeatherData(response.data);
+            });
         });
     } else if (newDisplayedCountries.length === 0) {
       setErrorMessage("");
@@ -131,7 +154,7 @@ const App = () => {
           </p>
         );
       })}
-      <SingleCountry countryData={countryData} />
+      <SingleCountry countryData={countryData} weatherData={weatherData} />
     </div>
   );
 };

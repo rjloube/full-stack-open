@@ -25,8 +25,13 @@ const SingleCountry = ({ countryData, weatherData }) => {
           <img src={flagImage} width="200" height="200"></img>
         </p>
         <h2>Weather in {countryData.capital}</h2>
-        <p>temperature {Math.round((weatherData.main.temp - 273.15) * 100) / 100}</p>
-        <img src={`https://openweathermap.org/img/wn/${weatherData.weather[0].icon}@2x.png`}></img>
+        <p>
+          temperature {Math.round((weatherData.main.temp - 273.15) * 100) / 100}{" "}
+          Celcius
+        </p>
+        <img
+          src={`https://openweathermap.org/img/wn/${weatherData.weather[0].icon}@2x.png`}
+        ></img>
         <p>wind {weatherData.wind.speed} m/s</p>
       </>
     );
@@ -69,7 +74,8 @@ const App = () => {
   }, []);
 
   const handleCountryChange = (event) => {
-    console.log(event.target.value);
+    console.log("form event change:", event.target.value);
+    console.log("event.target.value bool:", Boolean(event.target.value));
     setCountry(event.target.value);
     const newDisplayedCountries = commonNames.filter((commonName) => {
       return commonName
@@ -77,7 +83,10 @@ const App = () => {
         .includes(event.target.value.toLowerCase());
     });
     console.log("newDisplayedCountries:", newDisplayedCountries);
-    if (newDisplayedCountries.length > 10) {
+    if (!event.target.value) {
+      console.log("no displayed countries");
+      setErrorMessage("");
+    } else if (newDisplayedCountries.length > 10) {
       setCountryData(null);
       setErrorMessage("Too many matches, specify another filter");
       setDisplayedCountries([]);
@@ -101,8 +110,6 @@ const App = () => {
               setWeatherData(response.data);
             });
         });
-    } else if (newDisplayedCountries.length === 0) {
-      setErrorMessage("");
     } else {
       setErrorMessage("");
       const formattedDisplayedCountries = newDisplayedCountries.map(
@@ -136,7 +143,7 @@ const App = () => {
       <p>{errorMessage}</p>
       {displayedCountries.map((displayedCountry) => {
         return (
-          <p>
+          <p key={displayedCountry}>
             {displayedCountry}
             <button
               onClick={() => {
@@ -146,7 +153,22 @@ const App = () => {
                   .get(
                     `https://studies.cs.helsinki.fi/restcountries/api/name/${displayedCountry}`
                   )
-                  .then((response) => setCountryData(response.data));
+                  .then((response) => {
+                    setCountryData(response.data);
+                    console.log(
+                      "countryData capital:",
+                      response.data.capital[0]
+                    );
+                    const capital = response.data.capital[0];
+                    axios
+                      .get(
+                        `https://api.openweathermap.org/data/2.5/weather?q=${capital}&appid=${api_key}`
+                      )
+                      .then((response) => {
+                        console.log("Open Weather API response:", response);
+                        setWeatherData(response.data);
+                      });
+                  });
               }}
             >
               show

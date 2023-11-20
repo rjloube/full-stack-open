@@ -64,23 +64,22 @@ const Error = ({ message }) => {
     return null;
   }
   return <div className="error-message">{message}</div>;
-}
+};
 
 const App = () => {
   const [persons, setPersons] = useState([]);
   const [notification, setNotification] = useState(null);
   const [error, setError] = useState(null);
+  const [newName, setNewName] = useState("");
+  const [newNumber, setNewNumber] = useState("");
+  const [newFilter, setNewFilter] = useState("");
+  const [showAll, setShowAll] = useState(true);
 
   useEffect(() => {
     personService.getAll().then((initialPersons) => {
       setPersons(initialPersons);
     });
   }, []);
-
-  const [newName, setNewName] = useState("");
-  const [newNumber, setNewNumber] = useState("");
-  const [newFilter, setNewFilter] = useState("");
-  const [showAll, setShowAll] = useState(true);
 
   const addContact = (event) => {
     event.preventDefault();
@@ -106,7 +105,9 @@ const App = () => {
       }
     });
 
-    if (alreadyExists) {
+    if (!contactObject.name || !contactObject.number) {
+      alert("Name or number missing");
+    } else if (alreadyExists) {
       alert(`${contactObject.name} is already added to phonebook`);
     } else if (modifiedPerson) {
       if (

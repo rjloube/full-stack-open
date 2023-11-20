@@ -1,5 +1,5 @@
 import axios from "axios";
-const baseUrl = "http://localhost:3001/persons";
+const baseUrl = "http://localhost:3001/api/persons";
 
 const getAll = () => {
   const request = axios.get(baseUrl);
@@ -18,10 +18,11 @@ const deletePerson = (id) => {
 };
 
 const updateNumber = (modifiedPerson, newNumber) => {
-  console.log('modifiedPerson:', modifiedPerson);
-  const putUrl = `${baseUrl}/${modifiedPerson.id}`
+  console.log("modifiedPerson:", modifiedPerson);
+  const putUrl = `${baseUrl}/${modifiedPerson.id}`;
   const request = axios.put(putUrl, {
-    name: modifiedPerson.name, number: newNumber,
+    name: modifiedPerson.name,
+    number: newNumber,
   });
   return request.then((response) => response.data);
 };

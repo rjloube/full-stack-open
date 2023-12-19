@@ -87,7 +87,6 @@ const App = () => {
       name: newName,
       number: newNumber,
     };
-    console.log("contactObject:", contactObject);
 
     const alreadyExists = persons.find((person) => {
       return (
@@ -98,16 +97,14 @@ const App = () => {
 
     const modifiedPerson = persons.find((person) => {
       if (
-        person.name === contactObject.name &&
+        person.name.toLowerCase() === contactObject.name.toLowerCase() &&
         person.number !== contactObject.number
       ) {
         return person;
       }
     });
 
-    if (!contactObject.name || !contactObject.number) {
-      alert("Name or number missing");
-    } else if (alreadyExists) {
+    if (alreadyExists) {
       alert(`${contactObject.name} is already added to phonebook`);
     } else if (modifiedPerson) {
       if (
@@ -136,13 +133,22 @@ const App = () => {
           });
       }
     } else {
-      personService.create(contactObject).then((newPerson) => {
-        setPersons(persons.concat(newPerson));
-        setNotification(`Added ${newPerson.name}`);
-        setTimeout(() => {
-          setNotification(null);
-        }, 5000);
-      });
+      personService
+        .create(contactObject)
+        .then((newPerson) => {
+          setPersons(persons.concat(newPerson));
+          setNotification(`Added ${newPerson.name}`);
+          setTimeout(() => {
+            setNotification(null);
+          }, 5000);
+        })
+        .catch((error) => {
+          console.log("error.response.data.error:", error.response.data.error);
+          setError(error.response.data.error);
+          setTimeout(() => {
+            setError(null);
+          }, 5000);
+        });
     }
   };
 
